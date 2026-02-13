@@ -200,6 +200,26 @@ Root (Sequence)
 |------|------|
 | [basic_example.cpp](examples/basic_example.cpp) | 最小行为树：action、sequence、selector |
 | [bt_example.cpp](examples/bt_example.cpp) | 完整演示：parallel、inverter、回调、统计 |
+| [async_example.cpp](examples/async_example.cpp) | 多线程异步 I/O：`std::async` + `std::future` |
+| [threadpool_example.cpp](examples/threadpool_example.cpp) | 线程池异步 I/O：[progschj/ThreadPool](https://github.com/progschj/ThreadPool) |
+
+### 异步模式
+
+两个异步示例演示了基于真实后台线程的非阻塞叶子节点：
+
+```
+主线程（BT tick 循环，50ms 间隔）
+  |
+  +-- Tick 1: 向后台线程提交 I/O 任务
+  +-- Tick 2: 轮询 future（非阻塞 wait_for(0s)）
+  +-- Tick 3: 部分任务完成，其余仍 RUNNING
+  +-- Tick 4: 全部完成 -> SUCCESS
+```
+
+**`std::async`**: 每个任务创建新线程。简单直接，但每次都有线程创建/销毁开销。
+
+**线程池**: 固定 N 个 worker 线程。任务排队复用线程。
+适合高频任务提交场景，资源使用可控。
 
 ## 编译与测试
 
@@ -210,6 +230,8 @@ cmake --build . -j$(nproc)
 ctest --output-on-failure
 ./examples/bt_basic_example
 ./examples/bt_example
+./examples/bt_async_example
+./examples/bt_threadpool_example
 ```
 
 ## 相关项目

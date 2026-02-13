@@ -39,6 +39,7 @@
 #define BT_BEHAVIOR_TREE_HPP_
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 
 #include <type_traits>

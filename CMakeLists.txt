@@ -19,6 +19,21 @@ if(BT_BUILD_TESTS)
 endif()
 
 if(BT_BUILD_EXAMPLES)
+    # Fetch progschj/ThreadPool (header-only, 98 lines, C++11)
+    include(FetchContent)
+    FetchContent_Declare(
+        ThreadPool
+        URL https://ghfast.top/https://github.com/progschj/ThreadPool/archive/refs/heads/master.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP ON
+    )
+    FetchContent_MakeAvailable(ThreadPool)
+
+    # Create interface target for ThreadPool header
+    add_library(thread_pool INTERFACE)
+    target_include_directories(thread_pool INTERFACE
+        ${threadpool_SOURCE_DIR}
+    )
+
     add_subdirectory(examples)
 endif()
 

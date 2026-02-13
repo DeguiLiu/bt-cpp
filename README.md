@@ -200,6 +200,26 @@ Root (Sequence)
 |---------|-------------|
 | [basic_example.cpp](examples/basic_example.cpp) | Minimal BT: action, sequence, selector |
 | [bt_example.cpp](examples/bt_example.cpp) | Full demo: parallel, inverter, callbacks, statistics |
+| [async_example.cpp](examples/async_example.cpp) | Multi-threaded async I/O via `std::async` + `std::future` |
+| [threadpool_example.cpp](examples/threadpool_example.cpp) | Thread pool async I/O via [progschj/ThreadPool](https://github.com/progschj/ThreadPool) |
+
+### Async Patterns
+
+Both async examples demonstrate non-blocking leaf nodes with real background threads:
+
+```
+Main thread (BT tick loop, 50ms interval)
+  |
+  +-- Tick 1: launch I/O tasks on background threads
+  +-- Tick 2: poll futures (non-blocking wait_for(0s))
+  +-- Tick 3: some tasks complete, others still RUNNING
+  +-- Tick 4: all done -> SUCCESS
+```
+
+**`std::async`**: Each task spawns a new thread. Simple but creates/destroys threads per task.
+
+**Thread pool**: Fixed pool of N worker threads. Tasks queue up and reuse threads.
+Better for high-frequency task submission and bounded resource usage.
 
 ## Build & Test
 
@@ -210,6 +230,8 @@ cmake --build . -j$(nproc)
 ctest --output-on-failure
 ./examples/bt_basic_example
 ./examples/bt_example
+./examples/bt_async_example
+./examples/bt_threadpool_example
 ```
 
 ## Related Projects
