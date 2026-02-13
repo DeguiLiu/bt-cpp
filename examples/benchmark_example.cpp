@@ -7,7 +7,7 @@
  * overhead from application logic.
  *
  * Benchmarks:
- * 1. Flat sequence (10 actions) - best case for sequential dispatch
+ * 1. Flat sequence (8 actions) - best case for sequential dispatch
  * 2. Deep nesting (5 levels) - measures traversal depth impact
  * 3. Parallel node (4 children) - concurrent tick coordination overhead
  * 4. Selector with early exit - short-circuit benefit
@@ -111,31 +111,28 @@ static void PrintResult(const BenchResult& r) {
 }
 
 // ============================================================================
-// Benchmark 1: Flat sequence (10 actions)
+// Benchmark 1: Flat sequence (8 actions)
 // ============================================================================
 
 static BenchResult BenchFlatSequence() {
   BenchContext ctx;
-  constexpr int kNumChildren = 10;
 
-  bt::Node<BenchContext> actions[kNumChildren] = {
-      bt::Node<BenchContext>("A0"), bt::Node<BenchContext>("A1"),
-      bt::Node<BenchContext>("A2"), bt::Node<BenchContext>("A3"),
-      bt::Node<BenchContext>("A4"), bt::Node<BenchContext>("A5"),
-      bt::Node<BenchContext>("A6"), bt::Node<BenchContext>("A7"),
-      bt::Node<BenchContext>("A8"), bt::Node<BenchContext>("A9"),
-  };
+  bt::Node<BenchContext> a0("A0"), a1("A1"), a2("A2"), a3("A3"), a4("A4"),
+      a5("A5"), a6("A6"), a7("A7");
+
+  bt::Node<BenchContext>* actions[] = {&a0, &a1, &a2, &a3,
+                                       &a4, &a5, &a6, &a7};
 
   bt::Node<BenchContext> root("FlatSeq");
   root.set_type(bt::NodeType::kSequence);
-  for (int i = 0; i < kNumChildren; ++i) {
-    actions[i].set_type(bt::NodeType::kAction).set_tick(IncrementTick);
-    root.AddChild(actions[i]);
+  for (auto* a : actions) {
+    a->set_type(bt::NodeType::kAction).set_tick(IncrementTick);
+    root.AddChild(*a);
   }
 
   bt::BehaviorTree<BenchContext> tree(root, ctx);
 
-  return RunBench("Flat Sequence (10 actions)", 100000, 1000, [&] {
+  return RunBench("Flat Sequence (8 actions)", 100000, 1000, [&] {
     tree.Reset();
     tree.Tick();
   });
@@ -175,21 +172,17 @@ static BenchResult BenchDeepNesting() {
 
 static BenchResult BenchParallel() {
   BenchContext ctx;
-  constexpr int kNumChildren = 4;
 
-  bt::Node<BenchContext> actions[kNumChildren] = {
-      bt::Node<BenchContext>("P0"),
-      bt::Node<BenchContext>("P1"),
-      bt::Node<BenchContext>("P2"),
-      bt::Node<BenchContext>("P3"),
-  };
+  bt::Node<BenchContext> p0("P0"), p1("P1"), p2("P2"), p3("P3");
+
+  bt::Node<BenchContext>* actions[] = {&p0, &p1, &p2, &p3};
 
   bt::Node<BenchContext> par("Par");
   par.set_type(bt::NodeType::kParallel)
       .set_parallel_policy(bt::ParallelPolicy::kRequireAll);
-  for (int i = 0; i < kNumChildren; ++i) {
-    actions[i].set_type(bt::NodeType::kAction).set_tick(IncrementTick);
-    par.AddChild(actions[i]);
+  for (auto* a : actions) {
+    a->set_type(bt::NodeType::kAction).set_tick(IncrementTick);
+    par.AddChild(*a);
   }
 
   bt::BehaviorTree<BenchContext> tree(par, ctx);
@@ -247,12 +240,10 @@ static BenchResult BenchSelectorEarlyExit() {
 static BenchResult BenchHandWritten() {
   BenchContext ctx;
 
-  return RunBench("Hand-written if-else (10 ops)", 100000, 1000, [&] {
+  return RunBench("Hand-written if-else (8 ops)", 100000, 1000, [&] {
     ctx.counter = 0;
-    // Equivalent to: Sequence of 10 actions, each incrementing counter
+    // Equivalent to: Sequence of 8 actions, each incrementing counter
     bool ok = true;
-    if (ok) { ++ctx.counter; }
-    if (ok) { ++ctx.counter; }
     if (ok) { ++ctx.counter; }
     if (ok) { ++ctx.counter; }
     if (ok) { ++ctx.counter; }
@@ -351,7 +342,7 @@ int main() {
   double overhead = (hand_written > 0) ? (bt_flat / hand_written) : 0;
 
   std::printf("\n------------------------------------------------------------\n");
-  std::printf("  BT Sequence(10) vs hand-written: %.1fx overhead\n", overhead);
+  std::printf("  BT Sequence(8) vs hand-written: %.1fx overhead\n", overhead);
   std::printf("  At 20Hz tick rate (50ms interval), BT overhead is < 0.001%%\n");
   std::printf("  Conclusion: framework cost is negligible for embedded use\n");
   std::printf("============================================================\n");

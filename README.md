@@ -228,12 +228,12 @@ Framework overhead is negligible for typical embedded tick rates:
 
 | Scenario | avg (ns) | p99 (ns) |
 |----------|----------|----------|
-| Flat Sequence (10 actions) | 130 | 222 |
-| Deep Nesting (5 levels) | 78 | 136 |
-| Parallel (4 children) | 75 | 131 |
-| Selector early exit (1/8) | 58 | 106 |
-| Realistic tree (8 nodes) | 97 | 174 |
-| Hand-written if-else (10 ops) | 30 | 36 |
+| Flat Sequence (8 actions) | 113 | 213 |
+| Deep Nesting (5 levels) | 71 | 126 |
+| Parallel (4 children) | 71 | 120 |
+| Selector early exit (1/8) | 54 | 102 |
+| Realistic tree (8 nodes) | 94 | 186 |
+| Hand-written if-else (8 ops) | 29 | 37 |
 
 BT overhead vs hand-written: ~4x. At 20Hz tick rate (50ms interval), this is < 0.001% of the tick budget.
 
