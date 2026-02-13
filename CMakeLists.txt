@@ -23,7 +23,7 @@ if(BT_BUILD_EXAMPLES)
     include(FetchContent)
     FetchContent_Declare(
         ThreadPool
-        URL https://ghfast.top/https://github.com/progschj/ThreadPool/archive/refs/heads/master.zip
+        URL https://github.com/progschj/ThreadPool/archive/refs/heads/master.zip
         DOWNLOAD_EXTRACT_TIMESTAMP ON
     )
     FetchContent_MakeAvailable(ThreadPool)
