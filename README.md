@@ -202,6 +202,7 @@ Root (Sequence)
 | [bt_example.cpp](examples/bt_example.cpp) | Full demo: parallel, inverter, callbacks, statistics |
 | [async_example.cpp](examples/async_example.cpp) | Multi-threaded async I/O via `std::async` + `std::future` |
 | [threadpool_example.cpp](examples/threadpool_example.cpp) | Thread pool async I/O via [progschj/ThreadPool](https://github.com/progschj/ThreadPool) |
+| [benchmark_example.cpp](examples/benchmark_example.cpp) | Framework overhead measurement (ns/tick) |
 
 ### Async Patterns
 
@@ -221,6 +222,23 @@ Main thread (BT tick loop, 50ms interval)
 **Thread pool**: Fixed pool of N worker threads. Tasks queue up and reuse threads.
 Better for high-frequency task submission and bounded resource usage.
 
+### Benchmark
+
+Framework overhead is negligible for typical embedded tick rates:
+
+| Scenario | avg (ns) | p99 (ns) |
+|----------|----------|----------|
+| Flat Sequence (10 actions) | 130 | 222 |
+| Deep Nesting (5 levels) | 78 | 136 |
+| Parallel (4 children) | 75 | 131 |
+| Selector early exit (1/8) | 58 | 106 |
+| Realistic tree (8 nodes) | 97 | 174 |
+| Hand-written if-else (10 ops) | 30 | 36 |
+
+BT overhead vs hand-written: ~4x. At 20Hz tick rate (50ms interval), this is < 0.001% of the tick budget.
+
+See [docs/design_zh.md](docs/design_zh.md) for architecture rationale and design decisions.
+
 ## Build & Test
 
 ```bash
@@ -232,6 +250,7 @@ ctest --output-on-failure
 ./examples/bt_example
 ./examples/bt_async_example
 ./examples/bt_threadpool_example
+./examples/bt_benchmark
 ```
 
 ## Related Projects

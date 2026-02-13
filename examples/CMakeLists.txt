@@ -24,3 +24,10 @@ target_link_libraries(bt_threadpool_example PRIVATE bt thread_pool Threads::Thre
 target_compile_options(bt_threadpool_example PRIVATE
     $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
 )
+
+add_executable(bt_benchmark benchmark_example.cpp)
+target_link_libraries(bt_benchmark PRIVATE bt)
+target_compile_definitions(bt_benchmark PRIVATE BT_USE_STD_FUNCTION)
+target_compile_options(bt_benchmark PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic -O2>
+)

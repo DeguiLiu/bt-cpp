@@ -202,6 +202,7 @@ Root (Sequence)
 | [bt_example.cpp](examples/bt_example.cpp) | 完整演示：parallel、inverter、回调、统计 |
 | [async_example.cpp](examples/async_example.cpp) | 多线程异步 I/O：`std::async` + `std::future` |
 | [threadpool_example.cpp](examples/threadpool_example.cpp) | 线程池异步 I/O：[progschj/ThreadPool](https://github.com/progschj/ThreadPool) |
+| [benchmark_example.cpp](examples/benchmark_example.cpp) | 框架开销基准测试（ns/tick） |
 
 ### 异步模式
 
@@ -221,6 +222,23 @@ Root (Sequence)
 **线程池**: 固定 N 个 worker 线程。任务排队复用线程。
 适合高频任务提交场景，资源使用可控。
 
+### 性能基准
+
+框架开销对典型嵌入式 tick 频率可忽略：
+
+| 场景 | 平均 (ns) | p99 (ns) |
+|------|-----------|----------|
+| 扁平 Sequence（10 个 action） | 130 | 222 |
+| 深层嵌套（5 层） | 78 | 136 |
+| Parallel（4 子节点） | 75 | 131 |
+| Selector 短路退出（1/8） | 58 | 106 |
+| 混合树（8 节点） | 97 | 174 |
+| 手写 if-else（10 次操作） | 30 | 36 |
+
+BT 相对手写代码开销约 4 倍。在 20Hz tick 频率（50ms 间隔）下，仅占 tick 预算的 < 0.001%。
+
+详见 [docs/design_zh.md](docs/design_zh.md) 了解架构设计决策。
+
 ## 编译与测试
 
 ```bash
@@ -232,6 +250,7 @@ ctest --output-on-failure
 ./examples/bt_example
 ./examples/bt_async_example
 ./examples/bt_threadpool_example
+./examples/bt_benchmark
 ```
 
 ## 相关项目
